@@ -41,6 +41,20 @@ export default ({ types: t }) => ({
             )
 
             path.replaceWith(lambda)
+        },
+
+        Identifier(path) {
+            if (path.node.name !== '_' || hasNoShortPropertyAccess(path)) {
+                return
+            }
+
+            const parameter = path.scope.generateUidIdentifier('_')
+            const lambda = t.arrowFunctionExpression(
+                [parameter],
+                parameter
+            )
+
+            path.replaceWith(lambda)
         }
     }
 })
