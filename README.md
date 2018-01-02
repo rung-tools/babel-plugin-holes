@@ -28,7 +28,7 @@ console.log(negate(10)) // -10
 const at = _[_]
 const call = _(_)
 
-console.log(at([5, 10, 15], 1])) // 10
+console.log(at([5, 10, 15], 1)) // 10
 call(console.log, 'Hello!') // 'Hello!'
 
 
