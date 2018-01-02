@@ -5,21 +5,44 @@ const hasNoShortPropertyAccess = path =>
 export default ({ types: t }) => ({
     visitor: {
         CallExpression(path) {
-            if (hasNoShortPropertyAccess(path)
-                || !t.isMemberExpression(path.node.callee)
-                || !t.isIdentifier(path.node.callee.object, { name: '_' })) {
+            if (hasNoShortPropertyAccess(path)) {
                 return
             }
 
-            const parameter = path.scope.generateUidIdentifier('_')
+            const isUnderscore = node => t.isIdentifier(node, { name: '_' })
+            const parameters = []
+
+            if (t.isMemberExpression(path.node.callee) && isUnderscore(path.node.callee.object)
+                || isUnderscore(path.node.callee)) {
+                parameters.push(path.scope.generateUidIdentifier('_'))
+            }
+
+            path.node.arguments
+                .filter(isUnderscore)
+                .forEach(arg => {
+                    parameters.push(path.scope.generateUidIdentifier('_'))
+                })
+
+            if (parameters.length === 0) {
+                return
+            }
+
+            const provider = parameters.slice()
+            const transformCallee = callee =>
+                isUnderscore(callee)
+                    ? provider.shift()
+                    : t.isMemberExpression(callee) && isUnderscore(callee.object)
+                        ? t.memberExpression(provider.shift(), callee.property, callee.computed)
+                        : callee
+
             const lambda = t.arrowFunctionExpression(
-                [parameter],
+                parameters,
                 t.callExpression(
-                    t.memberExpression(
-                        parameter,
-                        path.node.callee.property
-                    ),
-                    path.node.arguments
+                    transformCallee(path.node.callee),
+                    path.node.arguments.map(arg =>
+                        isUnderscore(arg)
+                            ? provider.shift()
+                            : arg)
                 )
             )
 
@@ -27,16 +50,36 @@ export default ({ types: t }) => ({
         },
 
         MemberExpression(path) {
-            if (!t.isIdentifier(path.node.object, { name: '_' }) || hasNoShortPropertyAccess(path)) {
+            if (hasNoShortPropertyAccess(path)) {
                 return
             }
 
-            const parameter = path.scope.generateUidIdentifier('_')
+            const isUnderscore = node => t.isIdentifier(node, { name: '_' })
+            const holes = []
+
+
+            if (isUnderscore(path.node.object)) {
+                holes.push(path.scope.generateUidIdentifier('_'))
+            }
+
+            if (isUnderscore(path.node.property)) {
+                holes.push(path.scope.generateUidIdentifier('_'))
+            }
+
+            if (holes.length === 0) {
+                return
+            }
+
+            const provider = holes.slice()
+            const transform = node => isUnderscore(node)
+                ? provider.shift()
+                : node
+
             const lambda = t.arrowFunctionExpression(
-                [parameter],
+                holes,
                 t.memberExpression(
-                    parameter,
-                    path.node.property,
+                    transform(path.node.object),
+                    transform(path.node.property),
                     path.node.computed
                 )
             )
