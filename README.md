@@ -60,6 +60,27 @@ console.log(assocOne('value', {})) // { value: 1 }
 If you want to use the original underscore, you can disable this plugin in
 current scope (and its children scopes) using `'no holes'` directive.
 
+## Options
+
+You can pass your own curry function with `{ curry: 'curry' }`. The generated functions
+will use it, so:
+
+```json
+{
+    "plugins": ["holes", { "curry": "curry" }]
+}
+```
+
+```js
+const add = _ + _
+```
+
+will emit:
+
+```js
+const add = curry((_2, _3) => _2 + _3)
+```
+
 ## Installation
 
 ```sh
@@ -91,6 +112,11 @@ require('babel-core').transform('code', {
   plugins: ['holes']
 });
 ```
+
+## Observation
+
+Using `++` and `--` has no warranties because Babel code generator has a bug that emits wrong
+code for a correct AST node. Their use is **not recommended**.
 
 # License
 

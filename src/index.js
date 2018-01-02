@@ -4,7 +4,7 @@ const hasNoHoles = path =>
 
 const currier = (curry, t) => node =>
     curry
-        ? t.callExpression(t.identifier(curry), node)
+        ? t.callExpression(t.identifier(curry), [node])
         : node
 
 export default ({ types: t }, options = {}) => {
