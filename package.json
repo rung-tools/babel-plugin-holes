@@ -1,9 +1,9 @@
 {
-  "name": "babel-plugin-short-property-access",
+  "name": "babel-plugin-holes",
   "version": "0.1.0",
-  "description": "Babel plugin to replace _.prop declarations by functions where _ is the argument",
+  "description": "Consistent Scala-like holes to increase code expressivity",
   "main": "lib/index.js",
-  "repository": "https://github.com/haskellcamargo/babel-plugin-short-property-access.git",
+  "repository": "https://github.com/rung-tools/babel-plugin-holes.git",
   "author": "Marcelo Camargo <marcelocamargo@linuxmail.org>",
   "license": "MIT",
   "scripts": {
@@ -19,7 +19,7 @@
     "functional programming"
   ],
   "bugs": {
-    "url": "https://github.com/haskellcamargo/babel-plugin-short-property-access/issues"
+    "url": "https://github.com/rung-tools/babel-plugin-holes/issues"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",

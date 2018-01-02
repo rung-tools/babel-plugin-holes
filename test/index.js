@@ -3,7 +3,7 @@ import path from 'path'
 import { expect } from 'chai'
 import { transformFileSync } from 'babel-core'
 
-describe('Short property access', () => {
+describe('Holes for JavaScript', () => {
     const fixtures = path.join(__dirname, 'fixtures')
 
     fs.readdirSync(fixtures).forEach(fixture => {
