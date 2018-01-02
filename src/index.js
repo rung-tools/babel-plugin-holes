@@ -43,6 +43,24 @@ export default ({ types: t }) => ({
             path.replaceWith(lambda)
         },
 
+        UnaryExpression(path) {
+            if (!t.isIdentifier(path.node.argument, { name: '_' }) || hasNoShortPropertyAccess(path)) {
+                return
+            }
+
+            const parameter = path.scope.generateUidIdentifier('_')
+            const lambda = t.arrowFunctionExpression(
+                [parameter],
+                t.unaryExpression(
+                    path.node.operator,
+                    parameter,
+                    path.node.prefix
+                )
+            )
+
+            path.replaceWith(lambda)
+        },
+
         Identifier(path) {
             if (path.node.name !== '_' || hasNoShortPropertyAccess(path)) {
                 return
