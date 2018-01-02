@@ -36,7 +36,8 @@ export default ({ types: t }) => ({
                 [parameter],
                 t.memberExpression(
                     parameter,
-                    path.node.property
+                    path.node.property,
+                    path.node.computed
                 )
             )
 
