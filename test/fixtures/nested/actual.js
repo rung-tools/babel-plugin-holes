@@ -1,1 +1,1 @@
-_.then(_.value())
+_ + _.then(_.value())
