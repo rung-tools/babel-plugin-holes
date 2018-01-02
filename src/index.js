@@ -4,6 +4,28 @@ const hasNoShortPropertyAccess = path =>
 
 export default ({ types: t }) => ({
     visitor: {
+        CallExpression(path) {
+            if (hasNoShortPropertyAccess(path)
+                || !t.isMemberExpression(path.node.callee)
+                || !t.isIdentifier(path.node.callee.object, { name: '_' })) {
+                return
+            }
+
+            const parameter = path.scope.generateUidIdentifier('_')
+            const lambda = t.arrowFunctionExpression(
+                [parameter],
+                t.callExpression(
+                    t.memberExpression(
+                        parameter,
+                        path.node.callee.property
+                    ),
+                    path.node.arguments
+                )
+            )
+
+            path.replaceWith(lambda)
+        },
+
         MemberExpression(path) {
             if (!t.isIdentifier(path.node.object, { name: '_' }) || hasNoShortPropertyAccess(path)) {
                 return
