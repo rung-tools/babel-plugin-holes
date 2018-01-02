@@ -1,5 +1,5 @@
 const getName = _.name
 function abobrinha() {
-    'no short property access'
+    'no holes'
     const lodashName = _.name
 }

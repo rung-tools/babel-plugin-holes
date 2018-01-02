@@ -1,11 +1,11 @@
-const hasNoShortPropertyAccess = path =>
+const hasNoHoles = path =>
     !!path.findParent(({ node }) =>
-        node.directives && node.directives.some(({ value }) => value.value === 'no short property access'))
+        node.directives && node.directives.some(({ value }) => value.value === 'no holes'))
 
 export default ({ types: t }) => ({
     visitor: {
         CallExpression(path) {
-            if (hasNoShortPropertyAccess(path)) {
+            if (hasNoHoles(path)) {
                 return
             }
 
@@ -50,7 +50,7 @@ export default ({ types: t }) => ({
         },
 
         MemberExpression(path) {
-            if (hasNoShortPropertyAccess(path)) {
+            if (hasNoHoles(path)) {
                 return
             }
 
@@ -88,7 +88,7 @@ export default ({ types: t }) => ({
         },
 
         BinaryExpression(path) {
-            if (hasNoShortPropertyAccess(path)) {
+            if (hasNoHoles(path)) {
                 return
             }
 
@@ -126,7 +126,7 @@ export default ({ types: t }) => ({
         },
 
         UnaryExpression(path) {
-            if (!t.isIdentifier(path.node.argument, { name: '_' }) || hasNoShortPropertyAccess(path)) {
+            if (!t.isIdentifier(path.node.argument, { name: '_' }) || hasNoHoles(path)) {
                 return
             }
 
@@ -144,7 +144,7 @@ export default ({ types: t }) => ({
         },
 
         Identifier(path) {
-            if (path.node.name !== '_' || hasNoShortPropertyAccess(path)) {
+            if (path.node.name !== '_' || hasNoHoles(path)) {
                 return
             }
 
