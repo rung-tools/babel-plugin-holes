@@ -43,6 +43,44 @@ export default ({ types: t }) => ({
             path.replaceWith(lambda)
         },
 
+        BinaryExpression(path) {
+            if (hasNoShortPropertyAccess(path)) {
+                return
+            }
+
+            const parameters = []
+            const isUnderscore = node => t.isIdentifier(node, { name: '_' })
+
+            if (isUnderscore(path.node.left)) {
+                parameters.push(path.scope.generateUidIdentifier('_'))
+            }
+
+            if (isUnderscore(path.node.right)) {
+                parameters.push(path.scope.generateUidIdentifier('_'))
+            }
+
+            if (parameters.length === 0) {
+                return
+            }
+
+            const provider = parameters.slice()
+            const transform = node =>
+                isUnderscore(node)
+                    ? provider.shift()
+                    : node
+
+            const lambda = t.arrowFunctionExpression(
+                parameters,
+                t.BinaryExpression(
+                    path.node.operator,
+                    transform(path.node.left),
+                    transform(path.node.right)
+                )
+            )
+
+            path.replaceWith(lambda)
+        },
+
         UnaryExpression(path) {
             if (!t.isIdentifier(path.node.argument, { name: '_' }) || hasNoShortPropertyAccess(path)) {
                 return
