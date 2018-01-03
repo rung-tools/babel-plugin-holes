@@ -10,6 +10,8 @@ const currier = (curry, t) => node =>
 export default ({ types: t }, options = {}) => {
     const curried = currier(options.curry, t)
     const isUnderscore = node => t.isIdentifier(node, { name: '_' })
+    const isUnderscoreAccess = node => t.isMemberExpression(node)
+        && isUnderscore(node.object)
 
     return {
         visitor: {
@@ -19,8 +21,7 @@ export default ({ types: t }, options = {}) => {
                 }
 
                 const parameters = []
-                if (t.isMemberExpression(path.node.callee) && isUnderscore(path.node.callee.object)
-                    || isUnderscore(path.node.callee)) {
+                if (isUnderscoreAccess(path.node.callee) || isUnderscore(path.node.callee)) {
                     parameters.push(path.scope.generateUidIdentifier('_'))
                 }
 
@@ -38,7 +39,7 @@ export default ({ types: t }, options = {}) => {
                 const transformCallee = callee =>
                     isUnderscore(callee)
                         ? provider.shift()
-                        : t.isMemberExpression(callee) && isUnderscore(callee.object)
+                        : isUnderscoreAccess(callee)
                             ? t.memberExpression(provider.shift(), callee.property, callee.computed)
                             : callee
 
@@ -62,12 +63,13 @@ export default ({ types: t }, options = {}) => {
                 }
 
                 const holes = []
+                let computed = false
 
                 if (isUnderscore(path.node.object)) {
                     holes.push(path.scope.generateUidIdentifier('_'))
                 }
 
-                if (isUnderscore(path.node.property)) {
+                if (computed = isUnderscore(path.node.property)) {
                     holes.push(path.scope.generateUidIdentifier('_'))
                 }
 
@@ -85,7 +87,7 @@ export default ({ types: t }, options = {}) => {
                     t.memberExpression(
                         transform(path.node.object),
                         transform(path.node.property),
-                        path.node.computed
+                        computed || path.node.computed
                     )
                 )
 

@@ -3,3 +3,5 @@ const inc = _4 => _4 + 1;
 const dec = _5 => _5 - 1;
 const subFrom100 = _6 => 100 - _6;
 const two = 1 + 1;
+_7 => _7 > 6;
+_8 => _8.length > 100;
