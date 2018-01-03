@@ -63,13 +63,13 @@ export default ({ types: t }, options = {}) => {
                 }
 
                 const holes = []
-                let computed = false
 
                 if (isUnderscore(path.node.object)) {
                     holes.push(path.scope.generateUidIdentifier('_'))
                 }
 
-                if (computed = isUnderscore(path.node.property)) {
+                const computed = isUnderscore(path.node.property)
+                if (computed) {
                     holes.push(path.scope.generateUidIdentifier('_'))
                 }
 
