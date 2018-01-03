@@ -17,12 +17,7 @@ export default ({ types: t }, options = { curry: false }) => {
     return {
         visitor: {
             CallExpression(path) {
-                if (state.skipNext) {
-                    state.skipNext = false
-                    return
-                }
-
-                if (hasNoHoles(path)) {
+                if (state.skipNext || hasNoHoles(path)) {
                     return
                 }
 

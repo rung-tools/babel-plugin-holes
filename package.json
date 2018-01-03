@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-holes",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Consistent Scala-like holes to increase code expressivity",
   "main": "lib/index.js",
   "repository": "https://github.com/rung-tools/babel-plugin-holes.git",
