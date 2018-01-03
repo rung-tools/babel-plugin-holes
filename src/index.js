@@ -12,6 +12,8 @@ export default ({ types: t }, options = { curry: false }) => {
     const isUnderscore = node => t.isIdentifier(node, { name: '_' })
     const isUnderscoreAccess = node => t.isMemberExpression(node)
         && isUnderscore(node.object)
+    const isUnderscoreCall = node => t.isCallExpression(node)
+        && (isUnderscore(node.callee) || isUnderscoreAccess(node.callee))
 
     return {
         visitor: {
@@ -97,11 +99,15 @@ export default ({ types: t }, options = { curry: false }) => {
 
                 const parameters = []
 
-                if (isUnderscore(path.node.left) || isUnderscoreAccess(path.node.left)) {
+                if (isUnderscore(path.node.left)
+                    || isUnderscoreAccess(path.node.left)
+                    || isUnderscoreCall(path.node.left)) {
                     parameters.push(path.scope.generateUidIdentifier('_'))
                 }
 
-                if (isUnderscore(path.node.right) || isUnderscoreAccess(path.node.right)) {
+                if (isUnderscore(path.node.right)
+                    || isUnderscoreAccess(path.node.right)
+                    || isUnderscoreCall(path.node.right)) {
                     parameters.push(path.scope.generateUidIdentifier('_'))
                 }
 
@@ -110,15 +116,21 @@ export default ({ types: t }, options = { curry: false }) => {
                 }
 
                 const provider = parameters.slice()
-                const transform = node =>
-                    isUnderscore(node)
-                        ? provider.shift()
-                        : isUnderscoreAccess(node)
-                            ? t.memberExpression(
-                                provider.shift(),
-                                node.property,
-                                node.computed)
-                            : node
+                const transform = node => {
+                    if (isUnderscore(node)) {
+                        return provider.shift()
+                    }
+
+                    if (isUnderscoreAccess(node)) {
+                        return t.memberExpression(provider.shift(), node.property, node.computed)
+                    }
+
+                    if (isUnderscoreCall(node)) {
+                        return t.callExpression(transform(node.callee), node.arguments)
+                    }
+
+                    return node
+                }
 
                 const lambda = t.arrowFunctionExpression(
                     parameters,
