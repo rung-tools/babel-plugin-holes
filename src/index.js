@@ -7,7 +7,7 @@ const currier = (curry, t) => node =>
         ? t.callExpression(t.identifier(curry), [node])
         : node
 
-export default ({ types: t }, options = {}) => {
+export default ({ types: t }, options = { curry: false, skip: [] }) => {
     const curried = currier(options.curry, t)
     const isUnderscore = node => t.isIdentifier(node, { name: '_' })
     const isUnderscoreAccess = node => t.isMemberExpression(node)
@@ -91,7 +91,7 @@ export default ({ types: t }, options = {}) => {
             },
 
             BinaryExpression(path) {
-                if (hasNoHoles(path)) {
+                if (hasNoHoles(path) || options.skip.indexOf(path.node.operator) !== -1) {
                     return
                 }
 
