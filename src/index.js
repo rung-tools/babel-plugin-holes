@@ -50,9 +50,7 @@ export default ({ types: t }, options = {}) => {
                         path.node.arguments.map(arg =>
                             isUnderscore(arg)
                                 ? provider.shift()
-                                : arg)
-                    )
-                )
+                                : arg)))
 
                 path.replaceWith(curried(lambda))
             },
@@ -87,9 +85,7 @@ export default ({ types: t }, options = {}) => {
                     t.memberExpression(
                         transform(path.node.object),
                         transform(path.node.property),
-                        computed || path.node.computed
-                    )
-                )
+                        computed || path.node.computed))
 
                 path.replaceWith(curried(lambda))
             },
@@ -101,11 +97,11 @@ export default ({ types: t }, options = {}) => {
 
                 const parameters = []
 
-                if (isUnderscore(path.node.left)) {
+                if (isUnderscore(path.node.left) || isUnderscoreAccess(path.node.left)) {
                     parameters.push(path.scope.generateUidIdentifier('_'))
                 }
 
-                if (isUnderscore(path.node.right)) {
+                if (isUnderscore(path.node.right) || isUnderscoreAccess(path.node.right)) {
                     parameters.push(path.scope.generateUidIdentifier('_'))
                 }
 
@@ -117,16 +113,19 @@ export default ({ types: t }, options = {}) => {
                 const transform = node =>
                     isUnderscore(node)
                         ? provider.shift()
-                        : node
+                        : isUnderscoreAccess(node)
+                            ? t.memberExpression(
+                                provider.shift(),
+                                node.property,
+                                node.computed)
+                            : node
 
                 const lambda = t.arrowFunctionExpression(
                     parameters,
                     t.BinaryExpression(
                         path.node.operator,
                         transform(path.node.left),
-                        transform(path.node.right)
-                    )
-                )
+                        transform(path.node.right)))
 
                 path.replaceWith(curried(lambda))
             },
@@ -142,9 +141,7 @@ export default ({ types: t }, options = {}) => {
                     t.unaryExpression(
                         path.node.operator,
                         parameter,
-                        path.node.prefix
-                    )
-                )
+                        path.node.prefix))
 
                 path.replaceWith(curried(lambda))
             },
@@ -157,8 +154,7 @@ export default ({ types: t }, options = {}) => {
                 const parameter = path.scope.generateUidIdentifier('_')
                 const lambda = t.arrowFunctionExpression(
                     [parameter],
-                    parameter
-                )
+                    parameter)
 
                 path.replaceWith(curried(lambda))
             }

@@ -5,3 +5,5 @@ const subFrom100 = 100 - _
 const two = 1 + 1
 _ > 6
 _.length > 100
+_.x > _.y
+const ageSum = _.age + _.age
