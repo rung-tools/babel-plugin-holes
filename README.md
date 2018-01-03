@@ -1,5 +1,8 @@
 # babel-plugin-holes
 
+[![NPM Version](https://img.shields.io/npm/v/babel-plugin-holes.svg?style=flat)](https://www.npmjs.org/package/babel-plugin-holes)
+[![NPM Downloads](https://img.shields.io/npm/dm/babel-plugin-holes.svg?style=flat)](https://www.npmjs.org/package/babel-plugin-holes)
+
 This plugin is made to bring the powerful expressivity of Scala functions to JavaScript.
 It provides a powerful system of holes to help on functional programming and function
 composition, enforcing the point-free style.
@@ -44,6 +47,13 @@ const toHexString = _.toString(16)
 
 console.log(toString(10)) // 10
 console.log(toHexString(10)) // 'a'
+
+// Binary property access
+const goodPassword = _.length >= 8
+const ageSum = _.age + _.age
+
+console.log(goodPassword('dolphins')) // true
+console.log(ageSum({ age: 21 }, { age: 30 })) // 51
 ```
 
 It works on identifiers, simple members, computed members, calls, binary and unary
