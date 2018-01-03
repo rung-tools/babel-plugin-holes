@@ -8,6 +8,7 @@ const currier = (curry, t) => node =>
         : node
 
 export default ({ types: t }, options = { curry: false }) => {
+    const state = { skipNext: false }
     const curried = currier(options.curry, t)
     const isUnderscore = node => t.isIdentifier(node, { name: '_' })
     const isUnderscoreAccess = node => t.isMemberExpression(node)
@@ -16,6 +17,11 @@ export default ({ types: t }, options = { curry: false }) => {
     return {
         visitor: {
             CallExpression(path) {
+                if (state.skipNext) {
+                    state.skipNext = false
+                    return
+                }
+
                 if (hasNoHoles(path)) {
                     return
                 }
@@ -91,7 +97,12 @@ export default ({ types: t }, options = { curry: false }) => {
             },
 
             BinaryExpression(path, { opts: { skip = [] } }) {
-                if (hasNoHoles(path) || skip.indexOf(path.node.operator) !== -1) {
+                if (skip.indexOf(path.node.operator) !== -1) {
+                    state.skipNext = true
+                    return
+                }
+
+                if (hasNoHoles(path)) {
                     return
                 }
 
