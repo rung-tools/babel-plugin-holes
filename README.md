@@ -48,12 +48,19 @@ const toHexString = _.toString(16)
 console.log(toString(10)) // 10
 console.log(toHexString(10)) // 'a'
 
+
 // Binary property access
 const goodPassword = _.length >= 8
 const ageSum = _.age + _.age
 
 console.log(goodPassword('dolphins')) // true
 console.log(ageSum({ age: 21 }, { age: 30 })) // 51
+
+
+// Binary method call
+const ellipsize = _.toString() + '...'
+
+console.log(ellipsize(100)) // 100...
 ```
 
 It works on identifiers, simple members, computed members, calls, binary and unary
